@@ -11,11 +11,11 @@ extension FloatMP: NumberEquatable {
 
   public static func ==(lhs: FloatMP, rhs: FloatMP) -> Bool {
 
-    mpfr_cmp(&lhs._mpfr, &rhs._mpfr) == 0
+    mpfr_equal_p(&lhs._mpfr, &rhs._mpfr) != 0
   }
 
   public static func !=(lhs: FloatMP, rhs: FloatMP) -> Bool {
 
-    mpfr_cmp(&lhs._mpfr, &rhs._mpfr) != 0
+    mpfr_equal_p(&lhs._mpfr, &rhs._mpfr) == 0
   }
 }

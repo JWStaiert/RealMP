@@ -7,7 +7,50 @@
 import Real
 import GnuMPFR
 
-public final class FloatMP: Number {
+public final class FloatMP: Real {
+
+  // ///////////////////////////////////////////////////////////////////////////
+  //
+  // Object Members
+  //
+  // ///////////////////////////////////////////////////////////////////////////
+
+  internal var _mpfr = mpfr_t()
+
+  deinit {
+
+    mpfr_clear(&_mpfr)
+  }
+
+  public init() {
+
+    mpfr_init(&_mpfr)
+  }
+
+  public convenience init(_ other: FloatMP) {
+
+    self.init()
+
+    mpfr_set(&_mpfr, &other._mpfr, Self._roundingMode)
+  }
+
+  public convenience init(_ special: SpecialValueInitializer, sign: Sign = .plus) {
+
+    self.init()
+
+    switch special {
+
+      case .toNaN:      mpfr_set_nan(&_mpfr)
+      case .toInfinity: mpfr_set_inf(&_mpfr, (sign == .plus) ? 1 : -1 )
+      case .toZero:     mpfr_set_zero(&_mpfr, (sign == .plus) ? 1 : -1 )
+    }
+  }
+
+  // ///////////////////////////////////////////////////////////////////////////
+  //
+  // Class Members
+  //
+  // ///////////////////////////////////////////////////////////////////////////
 
   public static var roundingMode: RoundingMode = .toNearestEven
 
@@ -33,199 +76,95 @@ public final class FloatMP: Number {
     set { mpfr_set_default_prec(mpfr_prec_t(newValue)) }
   }
 
-  internal var _mpfr = mpfr_t()
+  // ///////////////////////////////////////////////////////////////////////////
+  //
+  // Number Protocol Members
+  //
+  // ///////////////////////////////////////////////////////////////////////////
 
-  public init() {
-
-    mpfr_init(&_mpfr)
-  }
-
-  public convenience init(_ special: SpecialValue, sign: Sign = .plus) {
-
-    self.init()
-
-    switch special {
-
-      case .nan:      mpfr_set_nan(&_mpfr)
-      case .infinity: mpfr_set_inf(&_mpfr, (sign == .plus) ? 1 : -1 )
-      case .zero:     mpfr_set_zero(&_mpfr, (sign == .plus) ? 1 : -1 )
-    }
-  }
-
-  public convenience init?(_ value: String) {
+  public convenience init?<S>(_ value: S) where S : StringProtocol {
 
     self.init()
 
-    if mpfr_set_str(&_mpfr, value, 10, Self._roundingMode) != 0 {
+    if mpfr_set_reproducible_str(&_mpfr, value as? String) != 0 {
 
       return nil
     }
   }
 
-  deinit {
+  public var description: String {
 
-    mpfr_clear(&_mpfr)
+    get {
+
+      mpfr_get_reproducible_str(&_mpfr)
+    }
   }
 
-  /*
+  public func write<Target>(to target: inout Target) where Target : TextOutputStream {
 
-  public static var defaultPrecision: Int32 {
-
-    get { Int32(mpfr_get_default_prec()) }
-
-    set { mpfr_set_default_prec(mpfr_prec_t(newValue)) }
+    target.write(mpfr_get_reproducible_str(&_mpfr))
   }
 
-  public static var precisionMaximum: Int { get { get_MPFR_PREC_MAX() } }
+  // ///////////////////////////////////////////////////////////////////////////
+  //
+  // Numeric Protocol
+  //
+  // ///////////////////////////////////////////////////////////////////////////
 
-  public static var precisionMinimum: Int { get { get_MPFR_PREC_MIN() } }
-
-  internal let _mpfr = UnsafeMutablePointer<__mpfr_struct>(nil)
-
-  public var precision: Int32 { get { Int32(mpfr_get_prec(_mpfr)) } }
-
-  public init() {
-
-    mpfr_init(_mpfr)
-  }
-
-  public init(withPrecision precision: Int32) {
-
-    precondition(Self.precisionMinimum <= precision)
-    precondition(precision <= Self.precisionMaximum)
-
-    mpfr_init2(_mpfr, mpfr_prec_t(precision))
-  }
-
-  public convenience init(_ value: FloatMP) {
+  public convenience init?<T>(exactly source: T) where T : BinaryInteger {
 
     self.init()
 
-    mpfr_set(_mpfr, value._mpfr, Self._roundingMode)
-  }
+    if (T.isSigned) {
 
-  public convenience init(withPrecision precision: Int32, _ value: FloatMP) {
+      if mpfr_set_si(&_mpfr, Int(source), Self._roundingMode) != 0 {
 
-    self.init(withPrecision: precision)
+        return nil
+      }
+    }
+    else {
 
-    mpfr_set(_mpfr, value._mpfr, Self._roundingMode)
-  }
+      if mpfr_set_ui(&_mpfr, UInt(source), Self._roundingMode) != 0 {
 
-  public convenience init(_ value: UInt) {
-
-    self.init()
-
-    mpfr_set_ui(_mpfr, value, Self._roundingMode)
-  }
-
-  public convenience init(withPrecision precision: Int32, _ value: UInt) {
-
-    self.init(withPrecision: precision)
-
-    mpfr_set_ui(_mpfr, value, Self._roundingMode)
-  }
-
-  public convenience init(_ value: Int) {
-
-    self.init()
-
-    mpfr_set_si(_mpfr, value, Self._roundingMode)
-  }
-
-  public convenience init(withPrecision precision: Int32, _ value: Int) {
-
-    self.init(withPrecision: precision)
-
-    mpfr_set_si(_mpfr, value, Self._roundingMode)
-  }
-
-  public convenience init(_ value: Float) {
-
-    self.init()
-
-    mpfr_set_flt(_mpfr, value, Self._roundingMode)
-  }
-
-  public convenience init(withPrecision precision: Int32, _ value: Float) {
-
-    self.init(withPrecision: precision)
-
-    mpfr_set_flt(_mpfr, value, Self._roundingMode)
+        return nil
+      }
+    }
   }
 
   public convenience init(_ value: Double) {
 
     self.init()
 
-    mpfr_set_d(_mpfr, value, Self._roundingMode)
+#warning("TODO: Should return value be evaluated?")
+    mpfr_set_d(&_mpfr, value, Self._roundingMode)
   }
 
-  public convenience init(withPrecision precision: Int32, _ value: Double) {
+  public typealias Magnitude = FloatMP
 
-    self.init(withPrecision: precision)
+  public var magnitude: FloatMP {
 
-    mpfr_set_d(_mpfr, value, Self._roundingMode)
+    get {
+
+      let rop = FloatMP()
+
+      mpfr_abs(&rop._mpfr, &self._mpfr, Self._roundingMode)
+
+      return rop
+    }
   }
-
-  convenience init(_ value: String) {
-
-    self.init()
-
-    mpfr_set_str(_mpfr, value, 10, Self._roundingMode)
-  }
-
-  convenience init(withPrecision precision: Int32, _ value: String) {
-
-    self.init(withPrecision: precision)
-
-    mpfr_set_str(_mpfr, value, 10, Self._roundingMode)
-  }
-
-  convenience init(_ value: IntegerMP) {
-
-    self.init()
-
-    mpfr_set_z(_mpfr, value._mpz, Self._roundingMode)
-  }
-
-  convenience init(withPrecision precision: Int32, _ value: IntegerMP) {
-
-    self.init(withPrecision: precision)
-
-    mpfr_set_z(_mpfr, value._mpz, Self._roundingMode)
-  }
-
-  convenience init(_ value: RationalMP) {
-
-    self.init()
-
-    mpfr_set_q(_mpfr, value._mpq, Self._roundingMode)
-  }
-
-  convenience init(withPrecision precision: Int32, _ value: RationalMP) {
-
-    self.init(withPrecision: precision)
-
-    mpfr_set_q(_mpfr, value._mpq, Self._roundingMode)
-  }
-
-  deinit {
-
-    mpfr_clear(_mpfr)
-  }
-   */
 }
 
-public extension String.StringInterpolation {
+extension String.StringInterpolation {
 
-  mutating func appendInterpolation(_ value: FloatMP, digits: Int32 = 6, _ point: DecimalPoint = .float) {
+  public mutating func appendInterpolation(_ value: FloatMP, digits: Int = 6, _ point: DecimalPoint = .float) {
+
+    var str: String
+
     switch point {
-      case .float:
-        #warning("TODO: Implement float string.")
-        appendLiteral("float")
-      case.fixed:
-        #warning("TODO: Implement fixed string.")
-        appendLiteral("fixed")
+      case .float: str = mpfr_get_float_nsstring(&value._mpfr, digits, FloatMP._roundingMode)
+      case .fixed: str = mpfr_get_fixed_nsstring(&value._mpfr, digits, FloatMP._roundingMode)
     }
+
+    appendLiteral(str)
   }
 }

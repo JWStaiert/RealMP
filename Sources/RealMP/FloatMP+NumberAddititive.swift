@@ -9,7 +9,7 @@ import GnuMPFR
 
 extension FloatMP: NumberAdditive {
 
-  public static let zero: FloatMP = FloatMP(.zero)
+  public static let zero: FloatMP = FloatMP(.toZero)
 
   public static prefix func +(rhs: FloatMP) -> FloatMP {
 

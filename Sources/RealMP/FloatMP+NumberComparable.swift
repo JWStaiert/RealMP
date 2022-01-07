@@ -11,21 +11,21 @@ extension FloatMP: NumberComparable {
 
   public static func < (lhs: FloatMP, rhs: FloatMP) -> Bool {
 
-    (mpfr_cmp(&lhs._mpfr, &rhs._mpfr) < 0)
+    mpfr_less_p(&lhs._mpfr, &rhs._mpfr) != 0
   }
 
   public static func <= (lhs: FloatMP, rhs: FloatMP) -> Bool {
 
-    (mpfr_cmp(&lhs._mpfr, &rhs._mpfr) <= 0)
+    mpfr_lessequal_p(&lhs._mpfr, &rhs._mpfr) != 0
   }
 
   public static func > (lhs: FloatMP, rhs: FloatMP) -> Bool {
 
-    (mpfr_cmp(&lhs._mpfr, &rhs._mpfr) > 0)
+    mpfr_greater_p(&lhs._mpfr, &rhs._mpfr) != 0
   }
 
   public static func >= (lhs: FloatMP, rhs: FloatMP) -> Bool {
 
-    (mpfr_cmp(&lhs._mpfr, &rhs._mpfr) >= 0)
+    mpfr_greaterequal_p(&lhs._mpfr, &rhs._mpfr) != 0
   }
 }
