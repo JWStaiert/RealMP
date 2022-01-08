@@ -10,6 +10,6 @@ import Real
 import RealTestSupport
 import XCTest
 
-final class Tests_NumberComparable_Tests: Tests_NumberComparable<FloatMP> {
+final class FloatMP_NumberComparable_Tests: Tests_NumberComparable<FloatMP> {
 
 }

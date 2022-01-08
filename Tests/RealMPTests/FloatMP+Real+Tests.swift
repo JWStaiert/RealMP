@@ -10,6 +10,6 @@ import Real
 import RealTestSupport
 import XCTest
 
-final class Tests_Real_Tests: Tests_Real<FloatMP> {
+final class FloatMP_Real_Tests: Tests_Real<FloatMP> {
 
 }

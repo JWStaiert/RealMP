@@ -9,9 +9,14 @@ import GnuMPFR
 
 extension FloatMP: NumberLiteral {
 
-  public typealias FloatLiteralType = Double
+  public convenience init(_ value: Double) {
 
-  public typealias IntegerLiteralType = Int
+    self.init()
+
+    mpfr_set_d(&_mpfr, value, Self._roundingMode)
+  }
+
+  public typealias FloatLiteralType = Double
 
   public convenience init(floatLiteral value: FloatLiteralType) {
 
@@ -20,6 +25,8 @@ extension FloatMP: NumberLiteral {
     #warning("TODO: Should return value be evaluated?")
     mpfr_set_d(&_mpfr, value, Self._roundingMode)
   }
+
+  public typealias IntegerLiteralType = Int
 
   public convenience init(integerLiteral value: IntegerLiteralType) {
 

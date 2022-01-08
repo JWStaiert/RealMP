@@ -10,6 +10,6 @@ import Real
 import RealTestSupport
 import XCTest
 
-final class Tests_NumberEquatable_Tests: Tests_NumberEquatable<FloatMP> {
+final class FloatMP_NumberEquatable_Tests: Tests_NumberEquatable<FloatMP> {
 
 }

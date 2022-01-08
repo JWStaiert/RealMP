@@ -10,6 +10,6 @@ import Real
 import RealTestSupport
 import XCTest
 
-final class Tests_NumberMultiplicative_Tests: Tests_NumberMultiplicative<FloatMP> {
+final class FloatMP_NumberMultiplicative_Tests: Tests_NumberMultiplicative<FloatMP> {
 
 }

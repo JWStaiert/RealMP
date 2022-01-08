@@ -32,7 +32,7 @@ extension FloatMP: NumberAdditive {
 
   public static prefix func -(rhs: FloatMP) -> FloatMP {
 
-    mpfr_negate(&rhs._mpfr)
+    mpfr_negate(&rhs._mpfr, Self._roundingMode)
     
     return rhs
   }

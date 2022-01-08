@@ -86,23 +86,23 @@ public final class FloatMP: Real {
 
     self.init()
 
-    if mpfr_set_reproducible_str(&_mpfr, value as? String) != 0 {
+    if !mpfr_nsstring_assign(&_mpfr, value.lowercased()) {
 
       return nil
     }
   }
-
+  
   public var description: String {
 
     get {
 
-      mpfr_get_reproducible_str(&_mpfr)
+      mpfr_get_reproducible_nsstring(&_mpfr)
     }
   }
 
   public func write<Target>(to target: inout Target) where Target : TextOutputStream {
 
-    target.write(mpfr_get_reproducible_str(&_mpfr))
+    target.write(mpfr_get_reproducible_nsstring(&_mpfr))
   }
 
   // ///////////////////////////////////////////////////////////////////////////
@@ -129,14 +129,6 @@ public final class FloatMP: Real {
         return nil
       }
     }
-  }
-
-  public convenience init(_ value: Double) {
-
-    self.init()
-
-#warning("TODO: Should return value be evaluated?")
-    mpfr_set_d(&_mpfr, value, Self._roundingMode)
   }
 
   public typealias Magnitude = FloatMP

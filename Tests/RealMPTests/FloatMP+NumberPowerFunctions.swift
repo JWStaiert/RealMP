@@ -10,6 +10,6 @@ import Real
 import RealTestSupport
 import XCTest
 
-final class Tests_NumberPowerFunctions_Tests: Tests_NumberPowerFunctions<FloatMP> {
+final class FloatMP_NumberPowerFunctions_Tests: Tests_NumberPowerFunctions<FloatMP> {
 
 }
