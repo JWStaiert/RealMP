@@ -23,19 +23,25 @@ let package = Package(
       path: "../Real"
     ),
     .package(
-      name: "GnuMPFR",
-      path: "../GnuMPFR"
+      name: "LibDFP",
+      path: "../MP/LibDFP"
     ),
   ],
 
   targets: [
     .target(
       name: "RealMP",
-      dependencies: ["Real", "GnuMPFR"]
+      dependencies: ["Real", "LibDFP"]
     ),
     .testTarget(
       name: "RealMPTests",
-      dependencies: ["RealMP", .product(name: "RealTestSupport", package: "Real")]
+      dependencies: ["RealMP"]
     ),
-  ]
+  ],
+
+  swiftLanguageVersions: [.v5],
+
+  cLanguageStandard: .c17,
+
+  cxxLanguageStandard: .cxx17
 )
